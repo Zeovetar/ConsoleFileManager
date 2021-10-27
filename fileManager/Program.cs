@@ -16,43 +16,57 @@ namespace fileManager
             List<string> listdisk = new List<string>();
             data4draw(PathToFolder, strCount, listdisk);
             drawtree(listdisk, strCount);
- /*           string[] folders = Directory.GetDirectories(PathToFolder);
-            int i = 0;
-            listdisk.Add(PathToFolder);
-            foreach (var lsUpper in folders)
-            {
-                if (folders[i] != $"{PathToFolder}System Volume Information")
-                    {
-                    string[] insfolders = Directory.GetDirectories(folders[i]);
-                    string[] insfiles = Directory.GetFiles(folders[i]);
-                    string[] str = folders[i].Split("\\");
-                    listdisk.Add(str[1]);
-                    foreach (var ls in insfolders)
-                    {
-                        string[] str1 = ls.Split("\\");
-                        listdisk.Add($"|    {str1[2]}");
-                    }
-                    foreach (var ls in insfiles)
-                    {
-                        string[] str1 = ls.Split("\\");
-                        listdisk.Add($"|    {str1[2]}");
-                    }
-                    }
-                i++;
-            }*/
+
 
             static void drawtree(List<string> listdisk, int strCount)
             {
-                int i = 0;
-                foreach (var ls in listdisk)
+                int fistpage = 0;
+                int lastpage = 0;
+                do
                 {
-                    Console.WriteLine(ls);
-                    i++;
-                    if (i == strCount)
+
+                    if (lastpage > listdisk.Count)
                     {
-                        return;
+                        lastpage = listdisk.Count;
                     }
-                }
+                    else
+                    {
+                        lastpage = fistpage + strCount;
+                    }    
+                    int pages = listdisk.Count / strCount;
+                    Console.WriteLine($"Дерево состоит из {pages} страниц. \nДля показа следующей нажмите стрелку вправо, \nдля показа предыдущей стрелку влево");
+                    //Console.WriteLine(listdisk[10] + "!!!");
+                    string[] disk = listdisk[0].Split("\\");
+                    Console.WriteLine(disk[0]);
+                    //foreach (var ls in listdisk)
+                    for (int i = fistpage; i < lastpage; i++)
+                    {
+                        string[] lsspl = listdisk[i].Split("\\");
+                        char[] mask = new char[lsspl.Length + 1];
+                        mask[lsspl.Length] = '|';
+                        for (int j = 0; j < lsspl.Length - 1; j++)
+                        {
+                            mask[j] = ' ';
+                        }
+                        string strMask = new string(mask);
+                        Console.WriteLine($"{strMask}{lsspl[lsspl.Length - 1]}");
+                        //i++;
+                        /*                    if (i == strCount)
+                                            {
+                                                return;
+                                            }*/
+                    }
+                    if (Console.ReadKey().Key == ConsoleKey.RightArrow)
+                    {
+                        fistpage = fistpage + strCount;
+                        lastpage = fistpage + strCount;
+                    }
+                    else if (Console.ReadKey().Key == ConsoleKey.LeftArrow)
+                    {
+                        fistpage = fistpage - strCount;
+                        lastpage = fistpage + strCount;
+                    }
+                } while (Console.ReadKey().Key != ConsoleKey.X);
             }
 
         static string folder(string str)
@@ -66,34 +80,10 @@ namespace fileManager
             {
                 string[] folders = Directory.GetDirectories(strmem);
                 string[] files = Directory.GetFiles(strmem);
-                //var listdata = new List<string>(folders.GetLength(0));
                 foreach (var i in folders)
                     listdisk.Add(i);
                 foreach (var i in files)
                     listdisk.Add(i);
-                /*                int i = 0;
-                                listdisk.Add(strmem);
-                                foreach (var lsUpper in folders)
-                                {
-                                    if (folders[i] != $"{strmem}System Volume Information")
-                                    {
-                                        string[] insfolders = Directory.GetDirectories(folders[i]);
-                                        string[] insfiles = Directory.GetFiles(folders[i]);
-                                        string[] str = folders[i].Split("\\");
-                                        listdisk.Add(str[1]);
-                                        foreach (var ls in insfolders)
-                                        {
-                                            string[] str1 = ls.Split("\\");
-                                            listdisk.Add($"|    {str1[2]}");
-                                        }
-                                        foreach (var ls in insfiles)
-                                        {
-                                            string[] str1 = ls.Split("\\");
-                                            listdisk.Add($"|    {str1[2]}");
-                                        }
-                                    }
-                                    i++;
-                                }*/
             }
         }
     }
