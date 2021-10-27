@@ -35,10 +35,8 @@ namespace fileManager
                     }    
                     int pages = listdisk.Count / strCount;
                     Console.WriteLine($"Дерево состоит из {pages} страниц. \nДля показа следующей нажмите стрелку вправо, \nдля показа предыдущей стрелку влево");
-                    //Console.WriteLine(listdisk[10] + "!!!");
                     string[] disk = listdisk[0].Split("\\");
                     Console.WriteLine(disk[0]);
-                    //foreach (var ls in listdisk)
                     for (int i = fistpage; i < lastpage; i++)
                     {
                         string[] lsspl = listdisk[i].Split("\\");
@@ -50,11 +48,6 @@ namespace fileManager
                         }
                         string strMask = new string(mask);
                         Console.WriteLine($"{strMask}{lsspl[lsspl.Length - 1]}");
-                        //i++;
-                        /*                    if (i == strCount)
-                                            {
-                                                return;
-                                            }*/
                     }
                     if (Console.ReadKey().Key == ConsoleKey.RightArrow)
                     {
