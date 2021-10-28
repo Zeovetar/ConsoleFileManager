@@ -21,10 +21,11 @@ namespace fileManager
             static void drawtree(List<string> listdisk, int strCount)
             {
                 int fistpage = 0;
-                int lastpage = 0;
+                int lastpage = 0; // fistpage + strCount;
+                ConsoleKey doing = ConsoleKey.A;
                 do
                 {
-
+                    Console.Clear();
                     if (lastpage > listdisk.Count)
                     {
                         lastpage = listdisk.Count;
@@ -49,17 +50,28 @@ namespace fileManager
                         string strMask = new string(mask);
                         Console.WriteLine($"{strMask}{lsspl[lsspl.Length - 1]}");
                     }
-                    if (Console.ReadKey().Key == ConsoleKey.RightArrow)
+                    Console.WriteLine("\n== Аттрибуты выбранного элемента =============================\n");
+                    Console.WriteLine("\n== Аттрибуты выбранного элемента =============================");
+                    Console.WriteLine("\nДоступны команды: open\\close\\attrib\\copy\\del будете вводить? Если нет, нажмите \"с\"");
+                    string ans = Console.ReadLine();
+                    if (ans != "c")
+                    {
+                        Console.WriteLine("awaiting commands");
+                    }
+                    doing = Console.ReadKey().Key;
+                    if (doing == ConsoleKey.RightArrow && lastpage <= listdisk.Count)
                     {
                         fistpage = fistpage + strCount;
                         lastpage = fistpage + strCount;
+                        //Console.WriteLine("right");
                     }
-                    else if (Console.ReadKey().Key == ConsoleKey.LeftArrow)
+                    else if (doing == ConsoleKey.LeftArrow && fistpage >= 0)
                     {
                         fistpage = fistpage - strCount;
                         lastpage = fistpage + strCount;
+                        //Console.WriteLine("left");
                     }
-                } while (Console.ReadKey().Key != ConsoleKey.X);
+                } while (doing != ConsoleKey.X);
             }
 
         static string folder(string str)
