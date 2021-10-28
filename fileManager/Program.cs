@@ -67,6 +67,7 @@ namespace fileManager
                                 break;
                             case "attr": 
                                 Console.WriteLine(attrib(cmd[1]));
+                                Console.ReadKey();
                                 break;
                             default: throw new ArgumentException("Недопустимый код операции");
                         }
