@@ -9,6 +9,7 @@ namespace fileManager
     {
         static void Main(string[] args)
         {
+            Console.SetWindowSize(130,45);
             Console.OutputEncoding = System.Text.Encoding.Unicode;
             Console.InputEncoding = System.Text.Encoding.Unicode;
             var @PathToFolder = folder("lastFolder");
@@ -20,73 +21,56 @@ namespace fileManager
 
             static void drawFullTree(List<string> listdisk, int strCount)
             {
-                int fistpage = 0;
-                int lastpage = strCount; // fistpage + strCount;
+                int firstLine = 0;
+                int lastLine = strCount; // firstLine + strCount;
+                FileAttributes fAttr = new FileAttributes();
                 ConsoleKey doing = ConsoleKey.A;
                 do
                 {
-                    if (lastpage + strCount >= listdisk.Count)
+                    if (lastLine >= listdisk.Count)
                     {
-                        lastpage = listdisk.Count;
+                        lastLine = listdisk.Count;
                     }
                     else
                     {
-                        lastpage = fistpage + strCount;
+                        lastLine = firstLine + strCount;
                     }    
                     int pages = listdisk.Count / strCount;
-                    Console.WriteLine($"Дерево состоит из {pages + 1} страниц. \nДля показа следующей нажмите стрелку вправо, \nдля показа предыдущей стрелку влево");
-                    drawTree(fistpage, lastpage, listdisk);
-                    /*string[] disk = listdisk[0].Split("\\");
-                    /*Console.WriteLine(disk[0]);
-                    for (int i = fistpage; i < lastpage; i++)
-                    {
-                        string[] lsspl = listdisk[i].Split("\\");
-                        char[] mask = new char[lsspl.Length + 1];
-                        mask[lsspl.Length] = '|';
-                        for (int j = 0; j < lsspl.Length - 1; j++)
-                        {
-                            mask[j] = ' ';
-                        }
-                        string strMask = new string(mask);
-                        Console.WriteLine($"{strMask}{lsspl[lsspl.Length - 1]}");
-                    }
-                    Console.WriteLine("\n== Аттрибуты выбранного элемента =============================\n");
-                    Console.WriteLine("\n== Аттрибуты выбранного элемента =============================");
-                    Console.WriteLine("\nДоступны команды: open\\close\\attrib\\copy\\del будете вводить? Если нет, нажмите \"с\"");*/
+                    
+                    drawTree(firstLine, lastLine, listdisk, fAttr, pages, strCount);
                     string ans = Console.ReadLine();
                     if (ans != "c")
                     {
-                        //Console.WriteLine("awaiting commands");
-                        //string splt = Console.ReadLine();
                         string[] cmd = cmdParse(ans);
-                        //Console.WriteLine($"CMD {cmd[0]} PATH {cmd[1]}");
                         switch (cmd[0])
                         {
                             case "open": 
-                                data4list(cmd[1], listdisk);
+                                openFolder(cmd[1], listdisk);
                                 break;
-                            case "attr": 
-                                Console.WriteLine(attrib(cmd[1]));
-                                Console.ReadKey();
+                            case "attrib":
+                                fAttr = attrib(cmd[1]);
+                                //Console.ReadKey();
+                                break;
+                            case "close":
+                                closeFolder(cmd[1], listdisk);
                                 break;
                             default: throw new ArgumentException("Недопустимый код операции");
                         }
-                        int[] diapaz = checkLength(lastpage, fistpage, strCount, listdisk);
-                        drawTree(diapaz[0], diapaz[1], listdisk);
+                        int[] diapaz = checkLength(lastLine, firstLine, strCount, listdisk);
+                        drawTree(diapaz[0], diapaz[1], listdisk, fAttr, pages, strCount);
                     }
-                    Console.WriteLine($"Страница {lastpage/strCount + 1} из {pages + 1} <= | =>      Стрелка влево\\вправо для переключения страниц, пробел - остаться на странице и ввести команду");
+                    //Console.WriteLine($"Страница {lastLine/strCount + 1} из {pages + 1} <= | =>      Стрелка влево\\вправо для переключения страниц, \nпробел - остаться на странице и ввести команду. Выйти \"x\"");
+                    Console.WriteLine($"Страница {lastLine / strCount} из {pages + 1} <= | =>      Стрелка влево\\вправо для переключения страниц, \nпробел - остаться на странице и ввести команду. Выйти \"x\"");
                     doing = Console.ReadKey().Key;
-                    if (doing == ConsoleKey.RightArrow && lastpage <= listdisk.Count && fistpage + strCount < lastpage)
+                    if (doing == ConsoleKey.RightArrow && lastLine <= listdisk.Count && firstLine + strCount <= lastLine)
                     {
-                        fistpage = fistpage + strCount;
-                        lastpage = fistpage + strCount;
-                        //Console.WriteLine("right");
+                        firstLine = firstLine + strCount;
+                        lastLine = firstLine + strCount;
                     }
-                    else if (doing == ConsoleKey.LeftArrow && fistpage >= strCount)
+                    else if (doing == ConsoleKey.LeftArrow && firstLine >= strCount)
                     {
-                        fistpage = fistpage - strCount;
-                        lastpage = fistpage + strCount;
-                        //Console.WriteLine("left");
+                        firstLine = firstLine - strCount;
+                        lastLine = firstLine + strCount;
                     }
                 } while (doing != ConsoleKey.X);
             }
@@ -109,12 +93,14 @@ namespace fileManager
             }
 
 
-        static void drawTree(int fistpage, int lastpage, List<string> listdisk)
+        static void drawTree(int firstLine, int lastLine, List<string> listdisk, FileAttributes fla, int pages, int strcount)
             {
+                // отрисовка дерева папок и файлов
                 Console.Clear();
+                Console.WriteLine($"Дерево состоит из {pages + 1} страниц. \nДля показа следующей нажмите стрелку вправо, \nдля показа предыдущей стрелку влево");
                 string[] disk = listdisk[0].Split("\\");
                 Console.WriteLine(disk[0]);
-                    for (int i = fistpage; i < lastpage; i++)
+                    for (int i = firstLine; i < lastLine; i++)
                     {
                         string[] lsspl = listdisk[i].Split("\\");
                         char[] mask = new char[lsspl.Length + 1];
@@ -127,13 +113,19 @@ namespace fileManager
                         Console.WriteLine($"{strMask}{lsspl[lsspl.Length - 1]}");
                     }
                     Console.WriteLine("\n== Аттрибуты выбранного элемента =============================\n");
+                if (fla != 0)
+                {
+                    Console.WriteLine(fla);
+                }
                     Console.WriteLine("\n== Аттрибуты выбранного элемента =============================");
-                    Console.WriteLine("\nДоступны команды: open\\close\\attrib\\copy\\del будете вводить? Если нет, нажмите \"с\"");
+                    Console.WriteLine("\nДоступны команды: open\\close\\attrib будете вводить? Если нет, нажмите \"с\" и \"enter\"");
+                //Console.WriteLine($"Страница {lastLine / strcount} из {pages + 1} <= | =>      Стрелка влево\\вправо для переключения страниц, \nпробел - остаться на странице и ввести команду. Выйти \"x\"");
             }
 
 
-            static void data4list(string str, List<string> listdisk)
+            static void openFolder(string str, List<string> listdisk)
             {
+                //вставляю данные из открытой папки в список
                 int elInd = 0;
                 string[] folders = Directory.GetDirectories(str);
                 string[] files = Directory.GetFiles(str);
@@ -155,7 +147,31 @@ namespace fileManager
                     {
                         listdisk.Insert(elInd + 1, i);
                         elInd++;
+                    } 
+                }
+                
+            }
+
+
+            static void closeFolder(string str, List<string> listdisk)
+            {
+                //удаляю данные закрытой папки из списка
+                int elInd = 0;
+                string[] folders = Directory.GetDirectories(str);
+                string[] files = Directory.GetFiles(str);
+                foreach (var i in listdisk)
+                {
+                    if (i == str)
+                    {
+                        elInd = listdisk.IndexOf(i);
+                        break;
                     }
+                }
+                int fullLength = folders.Length + files.Length;
+                elInd++;
+                for (int i = elInd; i < fullLength + elInd; i++)
+                { 
+                    listdisk.RemoveAt(elInd);
                 }
             }
 
@@ -173,20 +189,24 @@ namespace fileManager
             }
 
 
-            static int [] checkLength(int lastpage, int fistpage, int strCount, List<string> listdisk)
+            static int [] checkLength(int lastLine, int firstLine, int strCount, List<string> listdisk)
             {
+                // Проверяю границы и пересчитываю вывод
                 int[] result = new int[2];
-                if (lastpage <= listdisk.Count && listdisk.Count <= strCount)
+                if (lastLine <= listdisk.Count && listdisk.Count <= strCount)
                 {
-                    result[0] = fistpage;// + strCount;
+                    result[0] = firstLine;
                     result[1] = listdisk.Count;
-                    //Console.WriteLine("right");
                 }
-                else if (fistpage >= strCount)
+                else if (firstLine >= strCount)
                 {
-                    result[0] = fistpage - strCount;
-                    result[1] = fistpage + strCount;
-                    //Console.WriteLine("left");
+                    result[0] = firstLine - strCount;
+                    result[1] = firstLine + strCount;
+                }
+                else
+                {
+                    result[0] = firstLine;
+                    result[1] = strCount;
                 }
                 return result;
             }
